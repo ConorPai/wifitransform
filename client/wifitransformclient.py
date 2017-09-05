@@ -30,12 +30,12 @@ if (method == '1'):
 
     print fileinfo
 
+    #提示正在下载文件
+    requests.get(url='http://' + connIPPort + '/showinfo?info=正在下载...')
+
     #下载文件
     urlString = 'http://' + connIPPort + '/download?fileid=' + fileinfo['fileid']
     res = requests.get(url=urlString, stream=True)
-
-    #提示正在下载文件
-    #requests.get(url='http://' + connIPPort + '/showinfo?info=正在下载...')
 
     #文件保存
     savefile = fileinfo['fileid'] + ".zip"
@@ -50,9 +50,9 @@ if (method == '1'):
     datasize = os.path.getsize(savefile)
 
     if (datamd5 != fileinfo['filemd5'] or datasize != fileinfo['filesize']):
-        print '下载错误'
+        requests.get(url='http://' + connIPPort + '/showinfo?info=下载错误!')
     else:
-        print '下载成功'
+        requests.get(url='http://' + connIPPort + '/showinfo?info=下载成功!')
 
 else:
     #数据上传
