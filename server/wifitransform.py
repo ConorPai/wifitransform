@@ -34,7 +34,7 @@ def main():
     if (len(params) == 1):
         params.append('1')
         params.append('/Users/paiconor/Downloads/数据下发')
-        params.append('192.168.99.144')
+        params.append('127.0.0.1')
         params.append('8000')
 
     if (len(params) <= 4):
