@@ -41,12 +41,16 @@ if (method == 1):
         if chunk:
             f.write(chunk)
 
+    f.close()
+
     print res
     datamd5 = getmd5(savefile)
     datasize = os.path.getsize(savefile)
 
     if (datamd5 != downData['filemd5'] or datasize != downData['filesize']):
         print '下载错误'
+    else:
+        print '下载成功'
 else:
     #数据上传
     workdir = connInfos['workdir']
