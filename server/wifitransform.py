@@ -1,20 +1,36 @@
 # coding=utf-8
 # 作用：发布微服务，提供生成二维码扫码连接下载文件功能
 
-import os, sys, uuid
+import os, sys, uuid, json
 from flask import Flask, request, send_from_directory, abort
-from common import GeneralQRCode, showImage, zip_dir
+from common import ShowQRCode, zip_dir, getmd5
 
 app = Flask(__name__)
 
 #临时目录
 tempdir = 'temp'
 
-#服务API，连接成功
-@app.route('/connectsuccess', methods=['GET'])
-def connect_success():
-    print '客户端连接成功'
-    return 'success', 200
+#服务API，获取下载文件信息
+@app.route('/downloadfileinfo', methods=['GET'])
+def download_file_info():
+
+    for parent, dirnames, filenames in os.walk(tempdir):
+        for filename in filenames:
+            totalfilename = tempdir + '/' + filename
+            if (filename.split('.')[1] == 'zip'):
+                fileinfo = {}
+                fileinfo['fileid'] = filename.split('.')[0]
+                fileinfo['filesize'] = os.path.getsize(totalfilename)
+                fileinfo['filemd5'] = getmd5(totalfilename)
+
+                jsonfileinfo = json.dumps(fileinfo, ensure_ascii=False)
+
+                jsonfileinfo = jsonfileinfo.replace('\\\\', '/');
+                jsonfileinfo = jsonfileinfo.replace('\\', '/');
+
+                return jsonfileinfo, 200
+
+    abort(404)
 
 #服务API，下载数据
 @app.route('/download', methods=['GET'])
@@ -24,6 +40,13 @@ def download_file():
     if os.path.isfile(filename):
         return send_from_directory('temp', fileid + '.zip', as_attachment=True)
     abort(404)
+
+#服务API，连接成功
+@app.route('/showinfo', methods=['GET'])
+def connect_success():
+    info = request.args.get('info')
+    print info
+    return 'success', 200
 
 #主函数
 def main():
@@ -55,14 +78,7 @@ def main():
     
     #生成连接二维码
     print '正在生成二维码...'
-    qrfile = tempdir + '/' + str(uuid.uuid1()) +'.jpg'
-    connectString = GeneralQRCode(qrfile, int(params[1]), params[2], params[3], params[4])
-    fConnString = open(tempdir + '/connectString.txt', 'a')
-    fConnString.write(connectString)
-    fConnString.flush()
-    fConnString.close()
-
-    showImage(qrfile)
+    ShowQRCode(-2, params[3], params[4], int(params[1]))
 
     #启动服务
     print '启动服务...'

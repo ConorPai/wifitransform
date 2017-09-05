@@ -1,11 +1,9 @@
 # coding=utf-8
 # 作用：通用方法
 
-import os, zipfile, platform
-import json
+import io, os, sys, zipfile, platform
 import hashlib
-import subprocess
-import qrcode
+from pyqrcode import QRCode
 
 #压缩文件夹
 def zip_dir(dirname, zipfilename):
@@ -24,66 +22,45 @@ def zip_dir(dirname, zipfilename):
     zf.close()
 
 #获取文件MD5
-def getmd5(filename):  
+def getmd5(filename):
     m = hashlib.md5()
     mfile = open(filename, 'rb')
     m.update(mfile.read())
     mfile.close()
     return m.hexdigest()
 
-#显示二维码图片
-def showImage(filename):
-    osName = platform.system()
-    if osName == 'Windows':
-        subprocess.Popen([filename], shell=True)
-    elif osName == 'Linux':
-        if subprocess.call(['which', 'gvfs-open'], stdout=subprocess.PIPE) == 0:
-            subprocess.Popen(['gvfs-open', filename])
-        elif subprocess.call(['which', 'shotwell'], stdout=subprocess.PIPE) == 0:
-            subprocess.Popen(['shotwell', filename])
-        else:
-            raise
-    elif osName == 'Darwin':
-        subprocess.Popen(['open', filename])
-    else:
-        raise Exception('other system')
+try:
+    b = u'\u2588'
+    sys.stdout.write(b + '\r')
+    sys.stdout.flush()
+except UnicodeEncodeError:
+    BLOCK = 'MM'
+else:
+    BLOCK = b
 
+#在命令行中显示二维码
+def print_cmd_qr(qrText, white=BLOCK, black='  ', enableCmdQR=True):
+    blockCount = int(enableCmdQR)
+    if abs(blockCount) == 0:
+        blockCount = 1
+    white *= abs(blockCount)
+    if blockCount < 0:
+        white, black = black, white
+    sys.stdout.write(' '*50 + '\r')
+    sys.stdout.flush()
+    qr = qrText.replace('0', white).replace('1', black)
+    sys.stdout.write(qr)
+    sys.stdout.flush()
 
-#获取连接字符串
-def GetQRCodeInfo(nMethod, workdir, strIP, strPort):
-    dataRoot = {}
-    dataRoot['version'] = '2'
-    dataRoot['IP'] = strIP
-    dataRoot['port'] = strPort
-    dataRoot['method'] = nMethod
-
-    if nMethod == 1:
-        datamd5 = getmd5(workdir)
-        datasize = os.path.getsize(workdir)
-
-        data = {}
-        data['fileid'] = workdir.split('/')[1].split('.')[0]
-        data['filename'] = workdir
-        data['filesize'] = datasize
-        data['filemd5'] = datamd5
-
-        dataRoot['downData'] = data
-    else:
-        dataRoot['workdir'] = workdir
-    
-    QRCodeInfo = json.dumps(dataRoot, ensure_ascii=False)
-
-    QRCodeInfo = QRCodeInfo.replace('\\\\', '/');
-    QRCodeInfo = QRCodeInfo.replace('\\', '/');
-
-    return QRCodeInfo
-
-def GeneralQRCode(qrfile, nMethod, workdir, strIP, strPort):
-    #生成连接信息
-    QRCodeInfo = GetQRCodeInfo(nMethod, workdir, strIP, strPort)
+#显示二维码
+def ShowQRCode(enableCmdQR, strIP, strPort, servertype):
 
     #生成二维码
-    img = qrcode.make(QRCodeInfo)
-    img.save(qrfile, 'JPEG')
+    sInfo = strIP + ':' + strPort + '-' + str(servertype)
+    img = QRCode(sInfo)
 
-    return QRCodeInfo
+    qrStorage = io.BytesIO()
+    img.png(qrStorage, scale=10)
+
+    #二维码在命令行显示
+    print_cmd_qr(img.text(1), enableCmdQR=enableCmdQR)
