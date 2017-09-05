@@ -62,6 +62,7 @@ def GetQRCodeInfo(nMethod, workdir, strIP, strPort):
         datasize = os.path.getsize(workdir)
 
         data = {}
+        data['fileid'] = workdir.split('/')[1].split('.')[0]
         data['filename'] = workdir
         data['filesize'] = datasize
         data['filemd5'] = datamd5
@@ -84,3 +85,5 @@ def GeneralQRCode(qrfile, nMethod, workdir, strIP, strPort):
     #生成二维码
     img = qrcode.make(QRCodeInfo)
     img.save(qrfile, 'JPEG')
+
+    return QRCodeInfo
