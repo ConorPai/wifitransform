@@ -1,64 +1,14 @@
 # coding=utf-8
 # 作用：发布微服务，提供生成二维码扫码连接下载文件功能
 
-import os, sys, uuid, platform
-import json
-import qrcode
-import subprocess
+import os, sys, uuid
 from flask import Flask, request
-from common import zip_dir, getmd5
+from common import GeneralQRCode, showImage, zip_dir
 
 app = Flask(__name__)
 
 #临时目录
 tempdir = 'temp'
-
-#获取连接字符串
-def GetConnInfo(nMethod, workdir, strIP, strPort):
-    dataRoot = {}
-    dataRoot['version'] = '2'
-    dataRoot['IP'] = strIP
-    dataRoot['port'] = strPort
-    dataRoot['method'] = nMethod
-
-    if nMethod == 1:
-        datafile = tempdir + '/' + str(uuid.uuid1()) +'.zip'
-        zip_dir(workdir, datafile)
-        datamd5 = getmd5(datafile)
-        datasize = os.path.getsize(datafile)
-
-        data = {}
-        data['filename'] = datafile
-        data['filesize'] = datasize
-        data['filemd5'] = datamd5
-
-        dataRoot['downData'] = data
-    else:
-        dataRoot['workdir'] = workdir
-    
-    strConnInfo = json.dumps(dataRoot, ensure_ascii=False)
-
-    strConnInfo = strConnInfo.replace('\\\\', '/');
-    strConnInfo = strConnInfo.replace('\\', '/');
-
-    return strConnInfo
-
-#显示二维码图片
-def showImage(filename):
-    osName = platform.system()
-    if osName == 'Windows':
-        subprocess.Popen([filename], shell=True)
-    elif osName == 'Linux':
-        if subprocess.call(['which', 'gvfs-open'], stdout=subprocess.PIPE) == 0:
-            subprocess.Popen(['gvfs-open', filename])
-        elif subprocess.call(['which', 'shotwell'], stdout=subprocess.PIPE) == 0:
-            subprocess.Popen(['shotwell', filename])
-        else:
-            raise
-    elif osName == 'Darwin':
-        subprocess.Popen(['open', filename])
-    else:
-        raise Exception('other system')
 
 #主函数
 def main():
@@ -80,13 +30,15 @@ def main():
         __import__('shutil').rmtree(tempdir)
     os.mkdir(tempdir)
 
-    #生成连接信息
-    strConnInfo = GetConnInfo(int(params[1]), params[2], params[3], params[4])
-
-    #生成二维码
-    img = qrcode.make(strConnInfo)
+    #下发数据时，将需要下发的目录压缩
+    if (params[1] == '1'):
+        zipfile = tempdir + '/' + str(uuid.uuid1()) +'.zip'
+        zip_dir(params[2], zipfile)
+        params[2] = zipfile
+    
+    #生成连接二维码
     qrfile = tempdir + '/' + str(uuid.uuid1()) +'.jpg'
-    img.save(qrfile, 'JPEG')
+    GeneralQRCode(qrfile, int(params[1]), params[2], params[3], params[4])
 
     showImage(qrfile)
 
