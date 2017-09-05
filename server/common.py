@@ -53,7 +53,7 @@ def print_cmd_qr(qrText, white=BLOCK, black='  ', enableCmdQR=True):
     sys.stdout.flush()
 
 #显示二维码
-def ShowQRCode(enableCmdQR, strIP, strPort, servertype):
+def ShowQRCode(strIP, strPort, servertype):
 
     #生成二维码
     sInfo = strIP + ':' + strPort + '-' + str(servertype)
@@ -63,4 +63,10 @@ def ShowQRCode(enableCmdQR, strIP, strPort, servertype):
     img.png(qrStorage, scale=10)
 
     #二维码在命令行显示
+    osName = platform.system()
+    if osName == 'Windows':
+        enableCmdQR = -1
+    else:
+        enableCmdQR = -2
+
     print_cmd_qr(img.text(1), enableCmdQR=enableCmdQR)

@@ -78,7 +78,7 @@ def main():
     
     #生成连接二维码
     print '正在生成二维码...'
-    ShowQRCode(-2, params[3], params[4], int(params[1]))
+    ShowQRCode(params[3], params[4], int(params[1]))
 
     #启动服务
     print '启动服务...'
