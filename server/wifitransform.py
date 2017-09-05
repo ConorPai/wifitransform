@@ -6,36 +6,42 @@ import json
 import qrcode
 import subprocess
 from flask import Flask, request
+from common import zip_dir, getmd5
+
 app = Flask(__name__)
 
+#临时目录
+tempdir = 'temp'
+
 #获取连接字符串
-def GetConnInfo(nMethod, downDataDir, strIP, strPort):
+def GetConnInfo(nMethod, workdir, strIP, strPort):
     dataRoot = {}
-    dataRoot['version'] = "1"
+    dataRoot['version'] = '2'
     dataRoot['IP'] = strIP
     dataRoot['port'] = strPort
+    dataRoot['method'] = nMethod
 
     if nMethod == 1:
-        listDownDatas = []
-        GetDirFile(downDataDir, '', listDownDatas)
-        dataRoot['downData'] = listDownDatas
+        datafile = tempdir + '/' + str(uuid.uuid1()) +'.zip'
+        zip_dir(workdir, datafile)
+        datamd5 = getmd5(datafile)
+        datasize = os.path.getsize(datafile)
+
+        data = {}
+        data['filename'] = datafile
+        data['filesize'] = datasize
+        data['filemd5'] = datamd5
+
+        dataRoot['downData'] = data
+    else:
+        dataRoot['workdir'] = workdir
+    
     strConnInfo = json.dumps(dataRoot, ensure_ascii=False)
 
-    strConnInfo = strConnInfo.replace("\\\\", "/");
-    strConnInfo = strConnInfo.replace("\\", "/");
+    strConnInfo = strConnInfo.replace('\\\\', '/');
+    strConnInfo = strConnInfo.replace('\\', '/');
 
     return strConnInfo
-
-#获取目录下的所有文件
-def GetDirFile(parentDir, directParentDir, listFiles):
-    for i in os.listdir(parentDir):
-        curPath = os.path.join(parentDir, i)
-        if os.path.isfile(curPath):
-            filePath = os.path.join(directParentDir, i)
-            listFiles.append(filePath)
-        else:
-            directParentDir2 = os.path.join(directParentDir, i)
-            GetDirFile(curPath, directParentDir2, listFiles)
 
 #显示二维码图片
 def showImage(filename):
@@ -61,20 +67,25 @@ def main():
     params = sys.argv
 
     if (len(params) == 1):
-        params.append("1")
-        params.append("/Users/paiconor/Downloads/数据下发")
-        params.append("192.168.99.144")
-        params.append("8000")
+        params.append('1')
+        params.append('/Users/paiconor/Downloads/数据下发')
+        params.append('192.168.99.144')
+        params.append('8000')
 
     if (len(params) <= 4):
         return
+
+    #清理临时目录
+    if os.path.exists(tempdir):
+        __import__('shutil').rmtree(tempdir)
+    os.mkdir(tempdir)
 
     #生成连接信息
     strConnInfo = GetConnInfo(int(params[1]), params[2], params[3], params[4])
 
     #生成二维码
     img = qrcode.make(strConnInfo)
-    qrfile = str(uuid.uuid1()) +'.jpg'
+    qrfile = tempdir + '/' + str(uuid.uuid1()) +'.jpg'
     img.save(qrfile, 'JPEG')
 
     showImage(qrfile)
