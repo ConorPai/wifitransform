@@ -65,7 +65,7 @@ def ShowQRCode(strIP, strPort, servertype):
     #二维码在命令行显示
     osName = platform.system()
     if osName == 'Windows':
-        enableCmdQR = -1
+        enableCmdQR = 1
     else:
         enableCmdQR = -2
 

@@ -45,7 +45,7 @@ def download_file():
 @app.route('/showinfo', methods=['GET'])
 def connect_success():
     info = request.args.get('info')
-    print info
+    print(info)
     return 'success', 200
 
 #主函数
@@ -64,24 +64,24 @@ def main():
         return
 
     #清理临时目录
-    print '清理临时目录...'
+    print('清理临时目录...')
     if os.path.exists(tempdir):
         __import__('shutil').rmtree(tempdir)
     os.mkdir(tempdir)
 
     #下发数据时，将需要下发的目录压缩
     if (params[1] == '1'):
-        print '正在压缩上传文件...'
+        print('正在压缩上传文件...')
         zipfile = tempdir + '/' + str(uuid.uuid1()) +'.zip'
         zip_dir(params[2], zipfile)
         params[2] = zipfile
     
     #生成连接二维码
-    print '正在生成二维码...'
+    print('正在生成二维码...')
     ShowQRCode(params[3], params[4], int(params[1]))
 
     #启动服务
-    print '启动服务...'
+    print('启动服务...')
     app.run(host=params[3], port=int(params[4]))
 
 main()
