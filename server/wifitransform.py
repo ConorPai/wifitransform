@@ -52,15 +52,28 @@ def connect_success():
 def main():
 
     #获取命令行参数
+    #参数1：服务类型：1-下载服务；2-上传服务
+    #参数2：下发数据路径或上传数据存放路径
+    #参数3：IP
+    #参数4：端口号
+    #参数5：二维码显示方式：1-使用图片浏览器显示；2-使用命令行显示
     params = sys.argv
 
+    #调试补全参数
     if (len(params) == 1):
         params.append('1')
         params.append('/Users/paiconor/Downloads/数据下发')
         params.append('0.0.0.0')
         params.append('8098')
+        params.append('1')
+    #参数只传传输目录，补全其它参数
+    elif len(params) == 2:
+        params.insert(1, '1')
+        params.append('0.0.0.0')
+        params.append('8098')
+        params.append('1')
 
-    if (len(params) <= 4):
+    if (len(params) <= 5):
         return
 
     #清理临时目录
@@ -78,7 +91,7 @@ def main():
     
     #生成连接二维码
     print('正在生成二维码...')
-    ShowQRCode(params[3], params[4], int(params[1]), 0)
+    ShowQRCode(params[3], params[4], int(params[1]), int(params[5]))
 
     #启动服务
     print('启动服务...')
