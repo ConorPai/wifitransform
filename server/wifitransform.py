@@ -45,43 +45,56 @@ def download_file():
 @app.route('/showinfo', methods=['GET'])
 def connect_success():
     info = request.args.get('info')
-    print info
+    print(info)
     return 'success', 200
 
 #主函数
 def main():
 
     #获取命令行参数
+    #参数1：服务类型：1-下载服务；2-上传服务
+    #参数2：下发数据路径或上传数据存放路径
+    #参数3：IP
+    #参数4：端口号
+    #参数5：二维码显示方式：1-使用图片浏览器显示；2-使用命令行显示
     params = sys.argv
 
+    #调试补全参数
     if (len(params) == 1):
         params.append('1')
         params.append('/Users/paiconor/Downloads/数据下发')
-        params.append('127.0.0.1')
-        params.append('8000')
+        params.append('0.0.0.0')
+        params.append('8098')
+        params.append('1')
+    #参数只传传输目录，补全其它参数
+    elif len(params) == 2:
+        params.insert(1, '1')
+        params.append('0.0.0.0')
+        params.append('8098')
+        params.append('1')
 
-    if (len(params) <= 4):
+    if (len(params) <= 5):
         return
 
     #清理临时目录
-    print '清理临时目录...'
+    print('清理临时目录...')
     if os.path.exists(tempdir):
         __import__('shutil').rmtree(tempdir)
     os.mkdir(tempdir)
 
     #下发数据时，将需要下发的目录压缩
     if (params[1] == '1'):
-        print '正在压缩上传文件...'
+        print('正在压缩上传文件...')
         zipfile = tempdir + '/' + str(uuid.uuid1()) +'.zip'
         zip_dir(params[2], zipfile)
         params[2] = zipfile
     
     #生成连接二维码
-    print '正在生成二维码...'
-    ShowQRCode(params[3], params[4], int(params[1]))
+    print('正在生成二维码...')
+    ShowQRCode(params[3], params[4], int(params[1]), int(params[5]))
 
     #启动服务
-    print '启动服务...'
+    print('启动服务...')
     app.run(host=params[3], port=int(params[4]))
 
 main()
