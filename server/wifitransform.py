@@ -72,6 +72,8 @@ def main():
         params.append('0.0.0.0')
         params.append('8098')
         params.append('1')
+    elif len(params) == 5:
+        params.append('1')
 
     if (len(params) <= 5):
         return
