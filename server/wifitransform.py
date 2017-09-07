@@ -57,8 +57,8 @@ def main():
     if (len(params) == 1):
         params.append('1')
         params.append('/Users/paiconor/Downloads/数据下发')
-        params.append('127.0.0.1')
-        params.append('8000')
+        params.append('0.0.0.0')
+        params.append('8098')
 
     if (len(params) <= 4):
         return
@@ -78,7 +78,7 @@ def main():
     
     #生成连接二维码
     print('正在生成二维码...')
-    ShowQRCode(params[3], params[4], int(params[1]))
+    ShowQRCode(params[3], params[4], int(params[1]), 0)
 
     #启动服务
     print('启动服务...')

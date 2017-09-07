@@ -14,7 +14,7 @@ def getmd5(filename):
     return m.hexdigest()
 
 #扫码获得IP、端口号和服务类型
-qrinfo = '127.0.0.1:8000-1'
+qrinfo = '127.0.0.1:8098-1'
 connIPPort = qrinfo.split('-')[0]
 method = qrinfo.split('-')[1]
 
