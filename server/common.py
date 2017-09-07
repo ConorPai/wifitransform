@@ -15,7 +15,7 @@ def zip_dir(dirname, zipfilename):
             for name in files:
                 filelist.append(os.path.join(root, name))
          
-    zf = zipfile.ZipFile(zipfilename, "w", zipfile.zlib.DEFLATED)
+    zf = zipfile.ZipFile(zipfilename, "w", zipfile.zlib.DEFLATED, allowZip64=True)
     for tar in filelist:
         arcname = tar[len(dirname):]
         zf.write(tar,arcname)
