@@ -19,6 +19,7 @@ connIPPort = qrinfo.split('-')[0]
 method = qrinfo.split('-')[1]
 
 #通知服务端连接成功
+print('客户端连接成功!')
 requests.get(url='http://' + connIPPort + '/showinfo?info=客户端连接成功!')
 
 # 数据下载
@@ -28,10 +29,9 @@ if (method == '1'):
     res = requests.get(url='http://' + connIPPort + '/downloadfileinfo')
     fileinfo = json.loads(res.content)
 
-    print(fileinfo)
-
     #提示正在下载文件
-    requests.get(url='http://' + connIPPort + '/showinfo?info=正在下载...')
+    print('正在下载数据...')
+    requests.get(url='http://' + connIPPort + '/showinfo?info=正在下载数据...')
 
     #下载文件
     urlString = 'http://' + connIPPort + '/download?fileid=' + fileinfo['fileid']
@@ -50,9 +50,13 @@ if (method == '1'):
     datasize = os.path.getsize(savefile)
 
     if (datamd5 != fileinfo['filemd5'] or datasize != fileinfo['filesize']):
-        requests.get(url='http://' + connIPPort + '/showinfo?info=下载错误!')
+        print('数据下载错误!')
+        requests.get(url='http://' + connIPPort + '/showinfo?info=数据下载错误!')
     else:
-        requests.get(url='http://' + connIPPort + '/showinfo?info=下载成功!')
+        print('数据下载成功!')
+        requests.get(url='http://' + connIPPort + '/showinfo?info=数据下载成功!')
+
+    requests.get(url='http://' + connIPPort + '/transformdone')
 
 else:
     #数据上传

@@ -53,16 +53,21 @@ def print_cmd_qr(qrText, white=BLOCK, black='  ', enableCmdQR=True):
     sys.stdout.flush()
 
 #显示二维码
-def ShowQRCode(strIP, strPort, servertype, showtype):
+def ShowQRCode(strIP, strPort, servertype, tempdir, showtype = 0):
 
     #生成二维码
     sInfo = strIP + ':' + strPort + '-' + str(servertype)
     img = QRCode(sInfo)
+    img.png(tempdir + '/qrcode.png', scale=5)
+
     qrStorage = io.BytesIO()
     img.png(qrStorage, scale=10)
 
+    #直接显示二维码
+    if showtype == 1:
+        img.show()
     #二维码在命令行显示
-    if showtype == 2:
+    elif showtype == 2:
         osName = platform.system()
         if osName == 'Windows':
             enableCmdQR = 1
@@ -70,6 +75,25 @@ def ShowQRCode(strIP, strPort, servertype, showtype):
             enableCmdQR = -2
 
         print_cmd_qr(img.text(1), enableCmdQR=enableCmdQR)
-    #直接显示二维码
-    else:
-        img.show()
+
+#显示日志，用于与C#进行通信交互
+def ShowLog(strTempDir, strLog):
+
+    if os.path.exists(strTempDir + '/mzlockread'):
+        while (True):
+            time.sleep(0.5);
+            if not os.path.exists(strTempDir + '/mzlockread'):
+                break;
+
+    lockfile = strTempDir + '/mzlockwrite'
+    f = open(lockfile, "a+")
+    f.close()
+
+    logfile = strTempDir + '/mzlog'
+    f = open(logfile, "a+", encoding='utf8')
+    f.write(strLog + '\n')
+    f.close()
+
+    print(strLog)
+
+    os.remove(lockfile)
