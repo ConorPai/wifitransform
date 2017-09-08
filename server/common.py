@@ -1,7 +1,7 @@
 # coding=utf-8
 # 作用：通用方法
 
-import io, os, sys, zipfile, platform
+import io, os, sys, zipfile, platform, time
 import hashlib
 from pyqrcode import QRCode
 
@@ -58,8 +58,11 @@ def ShowQRCode(strIP, strPort, servertype, tempdir, showtype = 0):
     #生成二维码
     sInfo = strIP + ':' + strPort + '-' + str(servertype)
     img = QRCode(sInfo)
+
+    #将二维码保存成文件
     img.png(tempdir + '/qrcode.png', scale=5)
 
+    #准备显示二维码
     qrStorage = io.BytesIO()
     img.png(qrStorage, scale=10)
 
@@ -79,21 +82,28 @@ def ShowQRCode(strIP, strPort, servertype, tempdir, showtype = 0):
 #显示日志，用于与C#进行通信交互
 def ShowLog(strTempDir, strLog):
 
+    #判断是否存在读锁
     if os.path.exists(strTempDir + '/mzlockread'):
+
+        #循环等到读锁释放
         while (True):
             time.sleep(0.5);
             if not os.path.exists(strTempDir + '/mzlockread'):
                 break;
 
+    #添加写锁
     lockfile = strTempDir + '/mzlockwrite'
     f = open(lockfile, "a+")
     f.close()
 
+    #写入日志
     logfile = strTempDir + '/mzlog'
     f = open(logfile, "a+", encoding='utf8')
     f.write(strLog + '\n')
     f.close()
 
-    print(strLog)
-
+    #释放写锁
     os.remove(lockfile)
+
+    #打印日志
+    print(strLog)

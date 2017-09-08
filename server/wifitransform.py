@@ -34,7 +34,7 @@ def download_file_info():
     abort(404)
 
 
-#数据传输完成，可以关闭服务
+#服务API，数据传输完成，可以关闭服务
 @app.route('/transformdone', methods=['GET'])
 def transformdone():
     global tempdir
@@ -51,7 +51,7 @@ def download_file():
         return send_from_directory(tempdir, fileid + '.zip', as_attachment=True)
     abort(404)
 
-#服务API，连接成功
+#服务API，客户端提示信息
 @app.route('/showinfo', methods=['GET'])
 def connect_success():
     info = request.args.get('info')

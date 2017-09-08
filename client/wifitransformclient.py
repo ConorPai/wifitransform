@@ -46,6 +46,7 @@ if (method == '1'):
 
     f.close()
 
+    #验证文件大小和MD5，是否与服务端一致
     datamd5 = getmd5(savefile)
     datasize = os.path.getsize(savefile)
 
@@ -56,6 +57,7 @@ if (method == '1'):
         print('数据下载成功!')
         requests.get(url='http://' + connIPPort + '/showinfo?info=数据下载成功!')
 
+    #提示服务端传输完成
     requests.get(url='http://' + connIPPort + '/transformdone')
 
 else:
