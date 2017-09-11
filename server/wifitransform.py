@@ -33,14 +33,6 @@ def download_file_info():
 
     abort(404)
 
-
-#服务API，数据传输完成，可以关闭服务
-@app.route('/transformdone', methods=['GET'])
-def transformdone():
-    global tempdir
-    ShowLog(tempdir, "mzcommand:|:transformdone")
-    return 'success', 200
-
 #服务API，下载数据
 @app.route('/download', methods=['GET'])
 def download_file():
@@ -51,9 +43,27 @@ def download_file():
         return send_from_directory(tempdir, fileid + '.zip', as_attachment=True)
     abort(404)
 
+#服务API，上传数据
+@app.route('/upload', methods=['POST'])
+def upload_file():
+
+    file = request.files['file']
+    global tempdir
+    filename = tempdir + '/upload.zip'
+    file.save(filename)
+
+    return 'success', 200
+
+#服务API，数据传输完成，可以关闭服务
+@app.route('/transformdone', methods=['GET'])
+def transformdone():
+    global tempdir
+    ShowLog(tempdir, "mzcommand:|:transformdone")
+    return 'success', 200
+
 #服务API，客户端提示信息
 @app.route('/showinfo', methods=['GET'])
-def connect_success():
+def show_info():
     info = request.args.get('info')
     global tempdir
     ShowLog(tempdir, info)
@@ -73,20 +83,42 @@ def main():
     #time.sleep(20)
 
     #调试补全参数
-    if (len(params) == 1):
-        params.append('1')
-        params.append('/Users/paiconor/Downloads/数据下发')
-        params.append('0.0.0.0')
-        params.append('8098')
-        params.append('temp')
-    #参数只传传输目录，补全其它参数
-    elif len(params) == 2:
-        params.insert(1, '1')
-        params.append('0.0.0.0')
-        params.append('8098')
-        params.append('temp')
-    elif len(params) == 5:
-        params.append('temp')
+    '''
+    bIsDownload = False
+
+    if bIsDownload:
+        if (len(params) == 1):
+            params.append('1')
+            params.append('E:\录屏')
+            params.append('127.0.0.1')
+            params.append('8098')
+            params.append('E:/白光楠/Code/DataDownServerDemo/DataDownServerDemo/bin/Release/temp')
+        #参数只传传输目录，补全其它参数
+        elif len(params) == 2:
+            params.insert(1, '1')
+            params.append('127.0.0.1')
+            params.append('8098')
+            params.append('temp')
+        elif len(params) == 5:
+            params.append('temp')
+    else:
+        if (len(params) == 1):
+            params.append('2')
+            params.append('E:\录屏')
+            params.append('127.0.0.1')
+            params.append('8098')
+            params.append('E:/白光楠/Code/DataDownServerDemo/DataDownServerDemo/bin/Release/temp')
+        #参数只传传输目录，补全其它参数
+        elif len(params) == 2:
+            params.insert(1, '2')
+            params.append('127.0.0.1')
+            params.append('8098')
+            params.append('temp')
+        elif len(params) == 5:
+            params.append('temp')
+
+        params[5] = params[2];
+    '''
 
     if (len(params) <= 5):
         return
@@ -111,6 +143,6 @@ def main():
 
     #启动服务
     ShowLog(tempdir, '正在启动数据服务...')
-    app.run(host=params[3], port=int(params[4]))
+    app.run(host=params[3], port=int(params[4]), threaded=True)
 
 main()

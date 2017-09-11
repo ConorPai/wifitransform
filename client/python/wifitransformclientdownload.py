@@ -29,20 +29,26 @@ if (method == '1'):
     res = requests.get(url='http://' + connIPPort + '/downloadfileinfo')
     fileinfo = json.loads(res.content)
 
-    #提示正在下载文件
-    print('正在下载数据...')
-    requests.get(url='http://' + connIPPort + '/showinfo?info=正在下载数据...')
-
     #下载文件
     urlString = 'http://' + connIPPort + '/download?fileid=' + fileinfo['fileid']
     res = requests.get(url=urlString, stream=True)
 
+    #提示正在下载文件
+    print('正在下载数据...')
+    requests.get(url='http://' + connIPPort + '/showinfo?info=正在下载数据...')
+
     #文件保存
-    savefile = fileinfo['fileid'] + ".zip"
+    savefile = 'C:/Users/win7/PycharmProjects/untitled/' + fileinfo['fileid'] + ".zip"
     f = open(savefile, "wb")
-    for chunk in res.iter_content(chunk_size=512):
+    fsize = fileinfo['filesize']
+    csize = int(fsize / 20)
+    tsize= 0
+    for chunk in res.iter_content(chunk_size=csize):
         if chunk:
             f.write(chunk)
+            tsize += len(chunk);
+            strmsg = '下载完成%.2f%%' % (float(int(tsize * 10000.0 / fsize)) / 100.0)
+            print(strmsg)
 
     f.close()
 
