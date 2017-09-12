@@ -56,7 +56,7 @@ def print_cmd_qr(qrText, white=BLOCK, black='  ', enableCmdQR=True):
 def ShowQRCode(strIP, strPort, servertype, tempdir, showtype = 0):
 
     #生成二维码
-    sInfo = strIP + ':' + strPort + '-' + str(servertype)
+    sInfo = str(servertype) + '-' + strPort + '-' + strIP
     img = QRCode(sInfo)
 
     #将二维码保存成文件

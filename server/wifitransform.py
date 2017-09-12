@@ -54,6 +54,13 @@ def upload_file():
 
     return 'success', 200
 
+#服务API，客户端连接成功
+@app.route('/connectdone', methods=['GET'])
+def connect_done():
+    global tempdir
+    ShowLog(tempdir, "mzcommand:|:connectdone")
+    return 'success', 200
+
 #服务API，数据传输完成，可以关闭服务
 @app.route('/transformdone', methods=['GET'])
 def transformdone():
@@ -126,9 +133,8 @@ def main():
     #清理临时目录
     global tempdir
     tempdir = params[5]
-    if os.path.exists(tempdir):
-        __import__('shutil').rmtree(tempdir)
-    os.mkdir(tempdir)
+    if not os.path.exists(tempdir):
+        os.mkdir(tempdir)
 
     #下发数据时，将需要下发的目录压缩
     if (params[1] == '1'):
@@ -142,7 +148,7 @@ def main():
     ShowQRCode(params[3], params[4], int(params[1]), tempdir)
 
     #启动服务
-    ShowLog(tempdir, '正在启动数据服务...')
-    app.run(host=params[3], port=int(params[4]), threaded=True)
+    ShowLog(tempdir, '等待客户端扫描二维码...')
+    app.run(host='0.0.0.0', port=int(params[4]), threaded=True)
 
 main()
