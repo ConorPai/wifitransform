@@ -1,7 +1,7 @@
 # coding=utf-8
 # 作用：发布微服务，提供生成二维码扫码连接下载文件功能
 
-import os, sys, uuid, json
+import os, sys, uuid, json, time
 from flask import Flask, request, send_from_directory, abort
 from common import ShowQRCode, zip_dir, getmd5, ShowLog
 
@@ -95,14 +95,14 @@ def main():
 
     if bIsDownload:
         if (len(params) == 1):
-            params.append('1')
+            params.append('mztransformdownload')
             params.append('E:\录屏')
             params.append('127.0.0.1')
             params.append('8098')
             params.append('E:/白光楠/Code/DataDownServerDemo/DataDownServerDemo/bin/Release/temp')
         #参数只传传输目录，补全其它参数
         elif len(params) == 2:
-            params.insert(1, '1')
+            params.insert(1, 'mztransformdownload')
             params.append('127.0.0.1')
             params.append('8098')
             params.append('temp')
@@ -110,14 +110,14 @@ def main():
             params.append('temp')
     else:
         if (len(params) == 1):
-            params.append('2')
+            params.append('mztransformupload')
             params.append('E:\录屏')
             params.append('127.0.0.1')
             params.append('8098')
             params.append('E:/白光楠/Code/DataDownServerDemo/DataDownServerDemo/bin/Release/temp')
         #参数只传传输目录，补全其它参数
         elif len(params) == 2:
-            params.insert(1, '2')
+            params.insert(1, 'mztransformupload')
             params.append('127.0.0.1')
             params.append('8098')
             params.append('temp')
@@ -133,11 +133,12 @@ def main():
     #清理临时目录
     global tempdir
     tempdir = params[5]
-    if not os.path.exists(tempdir):
-        os.mkdir(tempdir)
+    if os.path.exists(tempdir):
+        __import__('shutil').rmtree(tempdir)
+    os.mkdir(tempdir)
 
     #下发数据时，将需要下发的目录压缩
-    if (params[1] == '1'):
+    if (params[1] == 'mztransformdownload'):
         ShowLog(tempdir, '正在压缩下载数据...')
         zipfile = tempdir + '/' + str(uuid.uuid1()) +'.zip'
         zip_dir(params[2], zipfile)
@@ -145,7 +146,7 @@ def main():
     
     #生成连接二维码
     ShowLog(tempdir, '正在生成二维码...')
-    ShowQRCode(params[3], params[4], int(params[1]), tempdir)
+    ShowQRCode(params[3], params[4], params[1], tempdir)
 
     #启动服务
     ShowLog(tempdir, '等待客户端扫描二维码...')
