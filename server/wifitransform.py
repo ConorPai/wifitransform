@@ -90,16 +90,15 @@ def main():
     #time.sleep(20)
 
     #调试补全参数
-    '''
-    bIsDownload = False
+    bIsDownload = True
 
     if bIsDownload:
         if (len(params) == 1):
             params.append('mztransformdownload')
-            params.append('E:\录屏')
+            params.append('/Users/paiconor/Downloads/数据下发')
             params.append('127.0.0.1')
             params.append('8098')
-            params.append('E:/白光楠/Code/DataDownServerDemo/DataDownServerDemo/bin/Release/temp')
+            params.append('temp')
         #参数只传传输目录，补全其它参数
         elif len(params) == 2:
             params.insert(1, 'mztransformdownload')
@@ -111,10 +110,10 @@ def main():
     else:
         if (len(params) == 1):
             params.append('mztransformupload')
-            params.append('E:\录屏')
+            params.append('/Users/paiconor/Downloads/数据下发')
             params.append('127.0.0.1')
             params.append('8098')
-            params.append('E:/白光楠/Code/DataDownServerDemo/DataDownServerDemo/bin/Release/temp')
+            params.append('temp')
         #参数只传传输目录，补全其它参数
         elif len(params) == 2:
             params.insert(1, 'mztransformupload')
@@ -125,7 +124,6 @@ def main():
             params.append('temp')
 
         params[5] = params[2];
-    '''
 
     if (len(params) <= 5):
         return
