@@ -1,7 +1,7 @@
 # coding=utf-8
 # 作用：发布微服务，提供生成二维码扫码连接下载文件功能
 
-import os, sys, uuid, json, time
+import os, sys, uuid, json, time, urllib.parse
 from flask import Flask, request, send_from_directory, abort
 from common import ShowQRCode, zip_dir, getmd5, ShowLog
 
@@ -72,8 +72,10 @@ def transformdone():
 @app.route('/showinfo', methods=['GET'])
 def show_info():
     info = request.args.get('info')
+    infodecode = urllib.parse.unquote(info)
+
     global tempdir
-    ShowLog(tempdir, info)
+    ShowLog(tempdir, infodecode)
     return 'success', 200
 
 #主函数
@@ -90,13 +92,14 @@ def main():
     #time.sleep(20)
 
     #调试补全参数
+    '''
     bIsDownload = True
 
     if bIsDownload:
         if (len(params) == 1):
             params.append('mztransformdownload')
             params.append('/Users/paiconor/Downloads/数据下发')
-            params.append('127.0.0.1')
+            params.append('127.0.0.1:192.168.1.243:192.168.1.40:192.168.1.161:192.168.99.144')
             params.append('8098')
             params.append('temp')
         #参数只传传输目录，补全其它参数
@@ -124,6 +127,7 @@ def main():
             params.append('temp')
 
         params[5] = params[2];
+    '''
 
     if (len(params) <= 5):
         return

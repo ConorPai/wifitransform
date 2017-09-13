@@ -3,7 +3,7 @@
 
 import os, hashlib
 import requests
-import json
+import json, urllib.request
 
 #获取文件MD5
 def getmd5(filename):
@@ -14,7 +14,7 @@ def getmd5(filename):
     return m.hexdigest()
 
 #扫码获得IP、端口号和服务类型
-qrinfo = 'mztransformdownload-8098-192.168.80.1:192.168.159.1:192.168.6.91:192.168.6.37'
+qrinfo = 'mztransformdownload-8098-192.168.80.1:192.168.159.1:192.168.6.91:192.168.6.37:192.168.99.144'
 method = qrinfo.split('-')[0]
 port = qrinfo.split('-')[1]
 ips = qrinfo.split('-')[2]
@@ -36,8 +36,10 @@ if not bConnect:
     exit()
 
 #通知服务端连接成功
-print('客户端连接成功!')
-requests.get(url='http://' + ip + ':' + port + '/showinfo?info=客户端连接成功!')
+strInfo = '客户端连接成功!'
+print(strInfo)
+strInfoEncode = urllib.request.quote(strInfo)
+requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
 
 # 数据下载
 if (method == 'mztransformdownload'):
@@ -51,11 +53,13 @@ if (method == 'mztransformdownload'):
     res = requests.get(url=urlString, stream=True)
 
     #提示正在下载文件
-    print('正在下载数据...')
-    requests.get(url='http://' + ip + ':' + port + '/showinfo?info=正在下载数据...')
+    strInfo = '正在下载数据...'
+    print(strInfo)
+    strInfoEncode = urllib.request.quote(strInfo)
+    requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
 
     #文件保存
-    savefile = 'C:/Users/win7/PycharmProjects/untitled/' + fileinfo['fileid'] + ".zip"
+    savefile = '/Users/paiconor/PycharmProjects/wifitransform/wifitransform/client/python/' + fileinfo['fileid'] + ".zip"
     f = open(savefile, "wb")
     fsize = fileinfo['filesize']
     csize = int(fsize / 20)
@@ -63,7 +67,7 @@ if (method == 'mztransformdownload'):
     for chunk in res.iter_content(chunk_size=csize):
         if chunk:
             f.write(chunk)
-            tsize += len(chunk);
+            tsize += len(chunk)
             strmsg = '下载完成%.2f%%' % (float(int(tsize * 10000.0 / fsize)) / 100.0)
             print(strmsg)
 
@@ -74,11 +78,15 @@ if (method == 'mztransformdownload'):
     datasize = os.path.getsize(savefile)
 
     if (datamd5 != fileinfo['filemd5'] or datasize != fileinfo['filesize']):
-        print('数据下载错误!')
-        requests.get(url='http://' + ip + ':' + port + '/showinfo?info=数据下载错误!')
+        strInfo = '数据下载错误!'
+        print(strInfo)
+        strInfoEncode = urllib.request.quote(strInfo)
+        requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
     else:
-        print('数据下载成功!')
-        requests.get(url='http://' + ip + ':' + port + '/showinfo?info=数据下载成功!')
+        strInfo = '数据下载成功!'
+        print(strInfo)
+        strInfoEncode = urllib.request.quote(strInfo)
+        requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
 
     #提示服务端传输完成
     requests.get(url='http://' + ip + ':' + port + '/transformdone')
