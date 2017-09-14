@@ -102,6 +102,30 @@ class ViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
         }
     }
     
+    
+    //网络请求封装，下载文件到指定目录
+    func downloadrequest(urlstring : String, savePath : String) -> Bool {
+        
+        //url编码处理，防止特殊字符无法传输
+        let encodedStr = urlstring.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
+        let url:NSURL! = NSURL(string: encodedStr!)
+        let urlRequest : NSURLRequest = NSURLRequest(url: url as URL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 100)
+        var response:URLResponse?
+        
+        do{
+            //发出请求
+            let received:NSData? = try NSURLConnection.sendSynchronousRequest(urlRequest as URLRequest, returning: &response) as NSData
+            
+            var urlFile = NSURL(fileURLWithPath: savePath)
+            try received?.write(to: urlFile as URL, options: .atomicWrite)
+            return true
+            
+        } catch let error as NSError {
+            print(error)
+            return false
+        }
+    }
+    
     //无线传输
     func transformData(strQRCode : String) {
         
@@ -158,6 +182,9 @@ class ViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
                 let respJsonData:NSData = sRet.data(using: String.Encoding.utf8, allowLossyConversion: false)! as NSData
                 let decodedJsonDict:[String:AnyObject] = try JSONSerialization.jsonObject(with: respJsonData as Data, options: JSONSerialization.ReadingOptions.mutableContainers) as! [String:AnyObject]
                 
+                let _ = request(urlstring: "http://" + connIP + ":" + port + "/showinfo?info=正在下载数据...")
+                showinfo(strInfo: "正在下载数据...")
+                
                 //清空临时目录
                 let tempPath = NSHomeDirectory() + "/Documents/temp/"
                 if (FileManager.default.fileExists(atPath: tempPath)){
@@ -166,7 +193,20 @@ class ViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
                 try FileManager.default.createDirectory(atPath: tempPath, withIntermediateDirectories: true, attributes: [:])
                 
                 let savefile = tempPath + (decodedJsonDict["fileid"] as! String) + ".zip"
-                print(savefile)
+                let downloadurlstring = "http://" + connIP + ":" + port + "/download?fileid=" + (decodedJsonDict["fileid"] as! String)
+                let bret1 = downloadrequest(urlstring: downloadurlstring, savePath: savefile)
+                
+                if (!bret1) {
+                    let _ = request(urlstring: "http://" + connIP + ":" + port + "/showinfo?info=数据下载失败！")
+                    showinfo(strInfo: "数据下载失败！")
+                    return
+                }
+                else {
+                    let _ = request(urlstring: "http://" + connIP + ":" + port + "/showinfo?info=数据下载成功！")
+                    showinfo(strInfo: "数据下载成功！")
+                }
+                
+                let _ = request(urlstring: "http://" + connIP + ":" + port + "/transformdone")
                 
             } catch let error as NSError {
                 print(error)
