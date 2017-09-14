@@ -14,7 +14,7 @@ def getmd5(filename):
     return m.hexdigest()
 
 #扫码获得IP、端口号和服务类型
-qrinfo = 'mztransformdownload-8098-192.168.80.1:192.168.159.1:192.168.6.91:192.168.6.37:192.168.99.144'
+qrinfo = 'mztransformdownload-1-8098-192.168.80.1:192.168.159.1:192.168.6.91:192.168.6.37:192.168.99.144'
 method = qrinfo.split('-')[0]
 port = qrinfo.split('-')[1]
 ips = qrinfo.split('-')[2]

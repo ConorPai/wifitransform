@@ -5,6 +5,8 @@ import io, os, sys, zipfile, platform, time
 import hashlib
 from pyqrcode import QRCode
 
+serverVersion = '1'
+
 #压缩文件夹
 def zip_dir(dirname, zipfilename):
     filelist = []
@@ -55,8 +57,10 @@ def print_cmd_qr(qrText, white=BLOCK, black='  ', enableCmdQR=True):
 #显示二维码
 def ShowQRCode(strIP, strPort, servertype, tempdir, showtype = 0):
 
+
     #生成二维码
-    sInfo = servertype + '-' + strPort + '-' + strIP
+    global serverVersion
+    sInfo = servertype + '-' + serverVersion + '-' + strPort + '-' + strIP
     img = QRCode(sInfo)
 
     #将二维码保存成文件
