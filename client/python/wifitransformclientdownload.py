@@ -16,8 +16,9 @@ def getmd5(filename):
 #扫码获得IP、端口号和服务类型
 qrinfo = 'mztransformdownload-1-8098-192.168.80.1:192.168.159.1:192.168.6.91:192.168.6.37:192.168.99.144'
 method = qrinfo.split('-')[0]
-port = qrinfo.split('-')[1]
-ips = qrinfo.split('-')[2]
+version = qrinfo.split('-')[1]
+port = qrinfo.split('-')[2]
+ips = qrinfo.split('-')[3]
 
 bConnect = False
 iparray = ips.split(':')
@@ -90,7 +91,3 @@ if (method == 'mztransformdownload'):
 
     #提示服务端传输完成
     requests.get(url='http://' + ip + ':' + port + '/transformdone')
-
-else:
-    #数据上传
-    todo = 'TODO'
