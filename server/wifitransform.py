@@ -82,7 +82,7 @@ def show_info():
 def main():
 
     #获取命令行参数
-    #参数1：服务类型：1-下载服务；2-上传服务
+    #参数1：服务类型：mztransformdownload-下载服务；mztransformupload-上传服务
     #参数2：下发数据路径或上传数据存放路径
     #参数3：IP
     #参数4：端口号
