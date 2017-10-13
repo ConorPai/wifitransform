@@ -4,6 +4,15 @@
 import urllib.request
 import requests
 
+#统一进行消息处理
+def showMessage(ip, port, strInfo):
+    #命令行打印
+    print(strInfo)
+    #信息Url编码
+    strInfoEncode = urllib.request.quote(strInfo)
+    #信息传回服务端
+    requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
+
 #扫码获得IP、端口号和服务类型
 qrinfo = 'mztransformupload-1-8098-192.168.80.1:192.168.159.1:192.168.6.91:192.168.6.37:192.168.99.144'
 method = qrinfo.split('-')[0]
@@ -28,32 +37,20 @@ if not bConnect:
     exit()
 
 #通知服务端连接成功
-strInfo = '客户端连接成功!'
-print(strInfo)
-strInfoEncode = urllib.request.quote(strInfo)
-requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
+showMessage(ip, port, '客户端连接成功!')
 
 # 数据下载
 if (method == 'mztransformupload'):
 
     #提示正在上传文件
-    strInfo = '正在传输数据...'
-    print(strInfo)
-    strInfoEncode = urllib.request.quote(strInfo)
-    requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
+    showMessage(ip, port, '正在传输数据...')
 
     files = {'file': open('C:/Users/win7/Desktop/aa/aa.zip', 'rb')}
     res = requests.post('http://' + ip + ':' + port + '/upload', files=files)
     if (res.status_code == 200):
-        strInfo = '数据传输成功!'
-        print(strInfo)
-        strInfoEncode = urllib.request.quote(strInfo)
-        requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
+        showMessage(ip, port, '数据传输成功!')
     else:
-        strInfo = '数据传输错误!'
-        print(strInfo)
-        strInfoEncode = urllib.request.quote(strInfo)
-        requests.get(url='http://' + ip + ':' + port + '/showinfo?info=' + strInfoEncode)
+        showMessage(ip, port, '数据传输错误!')
 
     #提示服务端传输完成
     requests.get(url='http://' + ip + ':' + port + '/transformdone')
