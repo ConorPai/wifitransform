@@ -111,3 +111,14 @@ def ShowLog(strTempDir, strLog):
 
     #打印日志
     print(strLog)
+
+#获取服务端上传状态
+def GetUploadStatus(strTemp):
+
+    if os.path.exists(strTemp + '/mzuploadsuccess'):
+        return 1
+
+    if os.path.exists(strTemp + '/mzuploaderror'):
+        return 2
+
+    return 0

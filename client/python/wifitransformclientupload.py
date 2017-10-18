@@ -1,6 +1,7 @@
 # coding=utf-8
 # 作用：微服务接口验证客户端
 
+import time
 import urllib.request
 import requests
 
@@ -51,6 +52,26 @@ if (method == 'mztransformupload'):
         showMessage(ip, port, '数据传输成功!')
     else:
         showMessage(ip, port, '数据传输错误!')
+
+
+    #提示服务端上传完成
+    requests.get(url='http://' + ip + ':' + port + '/uploaddone')
+
+    #轮询获取服务端上传状态
+    while (True):
+
+        time.sleep(1)
+
+        res = requests.get(url='http://' + ip + ':' + port + '/uploadstatus')
+        if res.text == '0':
+            print('服务端正在上传')
+            continue
+        elif res.text == '1':
+            print('上传成功')
+            break
+        else:
+            print('上传失败')
+            break
 
     #提示服务端传输完成
     requests.get(url='http://' + ip + ':' + port + '/transformdone')

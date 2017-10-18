@@ -3,7 +3,7 @@
 
 import os, sys, uuid, json, time, urllib.parse
 from flask import Flask, request, send_from_directory, abort
-from common import ShowQRCode, zip_dir, getmd5, ShowLog
+from common import ShowQRCode, zip_dir, getmd5, ShowLog, GetUploadStatus
 
 app = Flask(__name__)
 
@@ -54,11 +54,25 @@ def upload_file():
 
     return 'success', 200
 
+#服务API，获取服务端上传状态
+@app.route('/uploadstatus', methods=['GET'])
+def upload_status():
+    global tempdir
+    status = GetUploadStatus(tempdir)
+    return str(status), 200
+
 #服务API，客户端连接成功
 @app.route('/connectdone', methods=['GET'])
 def connect_done():
     global tempdir
     ShowLog(tempdir, "mzcommand:|:connectdone")
+    return 'success', 200
+
+#服务API，数据上传完成，等待服务端进行数据接收
+@app.route('/uploaddone', methods=['GET'])
+def uploaddone():
+    global tempdir
+    ShowLog(tempdir, "mzcommand:|:uploaddone")
     return 'success', 200
 
 #服务API，数据传输完成，可以关闭服务
