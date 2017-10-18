@@ -63,6 +63,11 @@ if (method == 'mztransformupload'):
         time.sleep(1)
 
         res = requests.get(url='http://' + ip + ':' + port + '/uploadstatus')
+        
+        if not res.status_code == 200:
+            print('与服务端连接已断开')
+            break
+
         if res.text == '0':
             print('服务端正在上传')
             continue
